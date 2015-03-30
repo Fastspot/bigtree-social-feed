@@ -1,0 +1,15 @@
+#btx_social_feed_container { overflow: visible; }
+#btx_social_feed_container section { overflow: visible; }
+#btx_social_feed_container fieldset { overflow: visible; }
+#btx_social_feed_query { position: relative; }
+#btx_social_feed_query_spinner { background-image: url(../images/spinner.gif); background-size: 16px 16px; height: 16px; position: absolute; right: 7px; top: 7px; width: 16px; }
+#btx_social_feed_query_results { background: #FFF; border: 1px solid #AAA; border-radius: 0 0 2px 2px; position: absolute; top: 31px; width: 896px; z-index: 3; }
+#btx_social_feed_query_results a { border-bottom: 1px solid #EEE; display: block; font-family: "Helvetica", Arial; font-size: 13px; padding: 7px 10px; }
+#btx_social_feed_query_results a img { float: right; height: 26px; margin: -3px -3px 0 0; width: 26px; }
+#btx_social_feed_query_results a.with_image { line-height: 20px; }
+#btx_social_feed_query_results a:last-child { border: none; }
+#btx_social_feed_query_results a:hover { background: #EEE; }
+#btx_social_feed_query_clear { cursor: pointer; height: 16px; margin: 0; position: absolute; right: 7px; top: 7px; width: 16px; }
+#btx_social_feed_person_image { height: 26px; left: 3px; position: absolute; top: 3px; width: 26px; z-index: 2; }
+#btx_social_feed_person_name { background: #FFF; font-size: 13px; height: 30px; left: 1px; line-height: 30px; padding: 0 0 0 36px; position: absolute; top: 1px; width: 830px; z-index: 1; }
+#btx_social_feed_map { height: 400px; margin: 15px 0; width: 100%; }
