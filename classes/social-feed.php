@@ -157,6 +157,8 @@
 				return '" onclick="window.open(\'http://youtube.com/embed/'.$data->ID.'\',\'_blank\',\'fullscreen=no,width=640,height=400\'); return false;"';	
 			} elseif ($item["service"] == "Google+") {
 				return '" onclick="window.open(\''.$data->URL.'\',\'_blank\',\'fullscreen=no,width=960,height=650\'); return false;"';
+			} elseif ($item["service"] == "Facebook") {
+				return '" onclick="window.open(\''.$data->URL.'\',\'_blank\',\'fullscreen=no,width=960,height=650\'); return false;"';
 			}
 			return "";
 		}
@@ -237,6 +239,28 @@
 						$query = json_decode($f["query"],true);
 						$radius = is_numeric($query["radius"]) ? $query["radius"] : self::$DefaultLocationRadius;
 						self::syncData($f,"Flickr",$flickr->getPhotosByLocation($query["latitude"],$query["longitude"],$radius,"mi",self::$SyncCount));
+					}
+				} elseif ($f["service"] == "Facebook") {
+					$facebook = isset($facebook) ? $facebook : new BigTreeFacebookAPI;
+
+					if ($f["type"] == "Page") {
+						$response = $facebook->callUncached($f["query"]."/posts?fields=id,message,type,picture,link,actions,created_time,updated_time&limit=".self::$SyncCount);
+						// We're going to emulate the response from the more mature APIs
+						$data = new stdClass;
+						$data->Results = array();
+						foreach ($response->data as $item) {
+							$result = new stdClass;
+							$result->ID = $item->id;
+							$result->Message = $item->message;
+							$result->Type = $item->type;
+							$result->Picture = $item->picture;
+							$result->Link = $item->link;
+							$result->URL = $item->actions[0]->link;
+							$result->CreatedAt = date("Y-m-d H:i:s",strtotime($item->created_time));
+							$result->UpdatedAt = date("Y-m-d H:i:s",strtotime($item->updated_time));
+							$data->Results[] = $result;
+						}
+						self::syncData($f,"Facebook",$data);
 					}
 				}
 			}

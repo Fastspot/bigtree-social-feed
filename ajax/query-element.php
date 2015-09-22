@@ -20,11 +20,16 @@
 			);
 		}
 	// Person field, all of them need lookups
-	} elseif ($type == "Person") {
+	} elseif ($type == "Person" || $type == "Page") {
 		if ($service == "Flickr") {
 			$url = "flickr/person-query";
 ?>
 <input type="text" name="query" value="<?=htmlspecialchars($query)?>" placeholder="Flickr Email Address or Username" id="btx_social_feed_query_element" autocomplete="off" />
+<?
+		} elseif ($service == "Facebook") {
+			$url = "facebook/page-query";
+?>
+<input type="text" name="query" value="<?=htmlspecialchars($query)?>" placeholder="Facebook URL" id="btx_social_feed_query_element" autocomplete="off" />
 <?
 		} else {
 ?>

@@ -18,6 +18,10 @@
 			"Search",
 			"Location"
 		);
+	} elseif ($service == "Facebook") {
+		$types = array(
+			"Page"
+		);
 	} else {
 		$types = array(
 			"Person",

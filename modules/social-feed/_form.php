@@ -1,12 +1,14 @@
 <?
 	// Get a list of all the social services that are both connected and not explicitly disabled by the developer for Social Feed
 	$services = array();
+	$facebook = new BigTreeFacebookAPI;
 	$flickr = new BigTreeFlickrAPI;
 	$googleplus = new BigTreeGooglePlusAPI;
 	$instagram = new BigTreeInstagramAPI;
 	$twitter = new BigTreeTwitterAPI;
 	$youtube = new BigTreeYouTubeAPI;
 
+	($facebook->Connected   && !in_array("Facebook",$settings->Disabled))  ? $services[] = "Facebook"  : false;
 	($flickr->Connected     && !in_array("Flickr",$settings->Disabled))    ? $services[] = "Flickr"    : false;
 	($googleplus->Connected && !in_array("Google+",$settings->Disabled))   ? $services[] = "Google+"   : false;
 	($instagram->Connected  && !in_array("Instagram",$settings->Disabled)) ? $services[] = "Instagram" : false;
