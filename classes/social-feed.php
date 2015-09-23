@@ -244,17 +244,24 @@
 					$facebook = isset($facebook) ? $facebook : new BigTreeFacebookAPI;
 
 					if ($f["type"] == "Page") {
+						// Look up info on the page first to get username
+						$user_response = $facebook->callUncached($f["query"]."?fields=username,link");
+						
+						// Get posts
 						$response = $facebook->callUncached($f["query"]."/posts?fields=id,message,type,picture,link,actions,created_time,updated_time&limit=".self::$SyncCount);
+
 						// We're going to emulate the response from the more mature APIs
 						$data = new stdClass;
 						$data->Results = array();
 						foreach ($response->data as $item) {
 							$result = new stdClass;
 							$result->ID = $item->id;
-							$result->Message = $item->message;
-							$result->Type = $item->type;
-							$result->Picture = $item->picture;
 							$result->Link = $item->link;
+							$result->Message = $item->message;
+							$result->PageLink = $user_response->link;
+							$result->PageUsername = $user_response->username;
+							$result->Picture = $item->picture;
+							$result->Type = $item->type;
 							$result->URL = $item->actions[0]->link;
 							$result->CreatedAt = date("Y-m-d H:i:s",strtotime($item->created_time));
 							$result->UpdatedAt = date("Y-m-d H:i:s",strtotime($item->updated_time));
