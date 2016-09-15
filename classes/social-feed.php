@@ -2,7 +2,7 @@
 	/*
 		Class: BTXSocialFeed
 			Provides a blended feed of social info.
-			
+
 			Future updates planned:
 			- After adding a social query, sync that query immediately.
 			- If a social query changes, delete everything from that query and re-sync.
@@ -16,7 +16,7 @@
 		static $IgnoreReplies = true;		// Don't include Twitter tweets that begin with @username
 		static $ItemsToCache = array();		// Used internally
 		static $SyncCount = 50; 			// This is how many we'd like to have — some calls ignore what we request anyway
-		
+
 		static protected function _get($query) {
 			$items = array();
 			$q = sqlquery($query);
@@ -72,19 +72,97 @@
 		}
 
 		/*
-			Function: getRecent
-				Returns recent items from the stream.
+			Function: getPage
+				Returns a page of recent items from the stream.
 
 			Parameters:
+				page - The page number to include (starts at 1)
+				count - The number to return per page (defaults to 10)
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects
+		*/
+
+		function getPage($page = 1, $count = 10, $include_unapproved = false) {
+			$page = $page ? ($page - 1) : 0;
+
+			return static::getRecent(($count * $page).", $count", $include_unapproved);
+		}
+		
+		/*
+			Function: getPageCount
+				Returns the number of pages in the stream.
+
+			Parameters:
+				count - The number to return per page (defaults to 10)
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects
+		*/
+
+		function getPageCount($count = 10, $include_unapproved = false) {
+			$f = sqlfetch(sqlquery("SELECT COUNT(*) AS `count` FROM btx_social_feed_stream ".(!$include_unapproved ? "WHERE approved = 'on'" : "")));
+			$pages = ceil($f["count"] / $count);
+			
+			return $pages ? $pages : 1;
+		}
+
+		/*
+			Function: getPageCountInCategory
+				Returns the number of pages of items in a given category in the stream.
+
+			Parameters:
+				category - The category to require
+				count - The number to return per page (defaults to 10)
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects
+		*/
+
+		function getPageCountInCategory($category, $count, $include_unapproved = false) {
+			$results = sqlrows(sqlquery("SELECT DISTINCT(item) FROM btx_social_feed_stream_categories WHERE category = '".sqlescape($category)."'"));
+			$pages = ceil($results / $count);
+			
+			return $pages ? $pages : 1;
+		}
+
+		/*
+			Function: getPageInCategory
+				Returns a page of items from the stream in a specific category.
+
+			Parameters:
+				category - Category ID
+				page - The page number to include (starts at 1)
 				count - Number of results to return
-				include_uanapproved - Whether to include unapproved items
+				include_unapproved - Whether to include unapproved items
 
 			Returns:
 				An array of social objects.
 		*/
 
-		static function getRecent($count,$include_uanapproved = false) {
-			return self::_get("SELECT * FROM btx_social_feed_stream ".(!$include_uanapproved ? "WHERE approved = 'on'" : "")." ORDER BY date DESC LIMIT $count");
+		static function getPageInCategory($category, $page, $count, $include_unapproved = false) {
+			$page = $page ? ($page - 1) : 0;
+
+			return static::getRecentInCategory(($count * $page).", $count", $category, $include_unapproved);
+		}
+
+		/*
+			Function: getRecent
+				Returns recent items from the stream.
+
+			Parameters:
+				count - Number of results to return
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects.
+		*/
+
+		static function getRecent($count,$include_unapproved = false) {
+			return self::_get("SELECT * FROM btx_social_feed_stream ".(!$include_unapproved ? "WHERE approved = 'on'" : "")." ORDER BY date DESC LIMIT $count");
 		}
 
 		/*
@@ -94,14 +172,14 @@
 			Parameters:
 				count - Number of results to return
 				category - Category ID
-				include_uanapproved - Whether to include unapproved items
+				include_unapproved - Whether to include unapproved items
 
 			Returns:
 				An array of social objects.
 		*/
 
-		static function getRecentInCategory($count,$category,$include_uanapproved = false) {
-			return self::_get("SELECT s.* FROM btx_social_feed_stream AS `s` JOIN btx_social_feed_stream_categories AS `c` ON s.id = c.item WHERE c.category = '$category'".(!$include_uanapproved ? " AND s.approved = 'on'" : "")." ORDER BY s.date DESC LIMIT $count");
+		static function getRecentInCategory($count,$category,$include_unapproved = false) {
+			return self::_get("SELECT s.* FROM btx_social_feed_stream AS `s` JOIN btx_social_feed_stream_categories AS `c` ON s.id = c.item WHERE c.category = '$category'".(!$include_unapproved ? " AND s.approved = 'on'" : "")." ORDER BY s.date DESC LIMIT $count");
 		}
 
 		/*
@@ -112,14 +190,14 @@
 				count - Number of results to return
 				category - Category ID
 				service - Service to return (Flickr, Google+, Instagram, Twitter, YouTube)
-				include_uanapproved - Whether to include unapproved items
+				include_unapproved - Whether to include unapproved items
 
 			Returns:
 				An array of social objects.
 		*/
 
-		static function getRecentInCategoryFromService($count,$category,$service,$include_uanapproved = false) {
-			return self::_get("SELECT s.* FROM btx_social_feed_stream AS `s` JOIN btx_social_feed_stream_categories AS `c` ON s.id = c.item WHERE c.category = '$category' AND s.service = '$service'".(!$include_uanapproved ? " AND s.approved = 'on'" : "")." ORDER BY s.date DESC LIMIT $count");
+		static function getRecentInCategoryFromService($count,$category,$service,$include_unapproved = false) {
+			return self::_get("SELECT s.* FROM btx_social_feed_stream AS `s` JOIN btx_social_feed_stream_categories AS `c` ON s.id = c.item WHERE c.category = '$category' AND s.service = '$service'".(!$include_unapproved ? " AND s.approved = 'on'" : "")." ORDER BY s.date DESC LIMIT $count");
 		}
 
 		/*
@@ -129,14 +207,14 @@
 			Parameters:
 				count - Number of results to return
 				service - Service to return (Flickr, Google+, Instagram, Twitter, YouTube)
-				include_uanapproved - Whether to include unapproved items
+				include_unapproved - Whether to include unapproved items
 
 			Returns:
 				An array of social objects.
 		*/
 
-		static function getRecentFromService($count,$service,$include_uanapproved = false) {
-			return self::_get("SELECT * FROM btx_social_feed_stream WHERE service = '$service'".(!$include_uanapproved ? " AND approved = 'on'" : "")." ORDER BY date DESC LIMIT $count");
+		static function getRecentFromService($count,$service,$include_unapproved = false) {
+			return self::_get("SELECT * FROM btx_social_feed_stream WHERE service = '$service'".(!$include_unapproved ? " AND approved = 'on'" : "")." ORDER BY date DESC LIMIT $count");
 		}
 
 		/*
@@ -150,17 +228,26 @@
 			if ($item["service"] == "Twitter") {
 				return '" onclick="window.open(\'http://m.twitter.com/'.$data->User->Username.'/status/'.$data->ID.'/\',\'_blank\',\'fullscreen=no,width=600,height=500\'); return false;"';
 			} elseif ($item["service"] == "Instagram") {
-				return '" onclick="window.open(\''.$data->Image.'\',\'_blank\',\'fullscreen=no,width=612,height=612\'); return false;"';	
+				return '" onclick="window.open(\''.$data->Image.'\',\'_blank\',\'fullscreen=no,width=612,height=612\'); return false;"';
 			} elseif ($item["service"] == "Flickr") {
 				return '" onclick="window.open(\''.$data->Image640.'\',\'_blank\',\'fullscreen=no,width=640,height=640\'); return false;"';
 			} elseif ($item["service"] == "YouTube") {
-				return '" onclick="window.open(\'http://youtube.com/embed/'.$data->ID.'\',\'_blank\',\'fullscreen=no,width=640,height=400\'); return false;"';	
+				return '" onclick="window.open(\'http://youtube.com/embed/'.$data->ID.'\',\'_blank\',\'fullscreen=no,width=640,height=400\'); return false;"';
 			} elseif ($item["service"] == "Google+") {
 				return '" onclick="window.open(\''.$data->URL.'\',\'_blank\',\'fullscreen=no,width=960,height=650\'); return false;"';
 			} elseif ($item["service"] == "Facebook") {
 				return '" onclick="window.open(\''.$data->URL.'\',\'_blank\',\'fullscreen=no,width=960,height=650\'); return false;"';
 			}
 			return "";
+		}
+
+		// Filter functions for admin
+		static function filterActive($item) {
+			return $item["ignored"] ? false : true;
+		}
+
+		static function filterIgnored($item) {
+			return $item["ignored"] ? true : false;
 		}
 
 		/*
@@ -193,7 +280,7 @@
 					} elseif ($f["type"] == "Hashtag") {
 						self::syncData($f,"Twitter",$twitter->searchTweets("#".ltrim(trim($f["query"]),"#"),self::$SyncCount,"recent",false,false,false,$params));
 					} elseif ($f["type"] == "Search") {
-						self::syncData($f,"Twitter",$twitter->searchTweets(trim($f["query"]),self::$SyncCount,"recent",false,false,false,$params));	
+						self::syncData($f,"Twitter",$twitter->searchTweets(trim($f["query"]),self::$SyncCount,"recent",false,false,false,$params));
 					}
 				// Instagram
 				} elseif ($f["service"] == "Instagram") {
@@ -221,12 +308,19 @@
 				// YouTube
 				} elseif ($f["service"] == "YouTube") {
 					$youtube = isset($youtube) ? $youtube : new BigTreeYouTubeAPI;
-
+					
 					if ($f["type"] == "Person") {
-						self::syncData($f,"YouTube",$youtube->getChannelVideos($f["query"],self::$SyncCount));
+						$results = $youtube->getChannelVideos($f["query"],self::$SyncCount);
 					} elseif ($f["type"] == "Search") {
-						self::syncData($f,"YouTube",$youtube->searchVideos($f["query"],self::$SyncCount,"date"));
+						$results = $youtube->searchVideos($f["query"],self::$SyncCount,"date");
 					}
+					
+					// Add channel data
+					foreach ($results->Results as &$result) {
+						$result->Channel = $youtube->getChannel(false, $result->ChannelID);
+					}
+					
+					self::syncData($f,"YouTube",$results);
 				// Flickr
 				} elseif ($f["service"] == "Flickr") {
 					$flickr = isset($flickr) ? $flickr : new BigTreeFlickrAPI;
@@ -246,7 +340,7 @@
 					if ($f["type"] == "Page") {
 						// Look up info on the page first to get username
 						$user_response = $facebook->callUncached($f["query"]."?fields=username,link");
-						
+
 						// Get posts
 						$response = $facebook->callUncached($f["query"]."/posts?fields=id,message,type,picture,link,actions,created_time,updated_time&limit=".self::$SyncCount);
 
