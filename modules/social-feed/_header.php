@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include our CSS and JS
 	$bigtree["css"][] = "social-feed.css";
 	$bigtree["js"][] = "social-feed.js";
@@ -26,4 +26,3 @@
 		"other-id" => $category_field["options"]["mtm-other-id"],
 		"data" => $_POST["categories"]
 	));
-?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	// Get a list of all the social services that are both connected and not explicitly disabled by the developer for Social Feed
 	$services = array();
 	$facebook = new BigTreeFacebookAPI;
@@ -23,7 +23,7 @@
 		<p>You do not have any connected social services. Please enable one or more service APIs in the <a href="<?=ADMIN_ROOT?>developer/services/">Developer tab</a>.</p>
 	</section>
 </div>
-<?
+<?php
 	} else {
 ?>
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
@@ -33,14 +33,14 @@
 			<fieldset>
 				<label>Service</label>
 				<select name="service" id="btx_social_feed_service_select">
-					<?
+					<?php
 						foreach ($services as $s) {
 							if ($service === false) {
 								$service = $s;
 							}
 					?>
-					<option<? if ($s == $service) { ?> selected="selected"<? } ?>><?=$s?></option>
-					<?
+					<option<?php if ($s == $service) { ?> selected="selected"<?php } ?>><?=$s?></option>
+					<?php
 						}
 					?>
 				</select>
@@ -48,26 +48,26 @@
 			<fieldset>
 				<label>Type</label>
 				<div id="btx_social_feed_type">
-					<? include EXTENSION_ROOT."ajax/type-dropdown.php" ?>
+					<?php include EXTENSION_ROOT."ajax/type-dropdown.php" ?>
 				</div>
 			</fieldset>
 			<fieldset>
 				<label>Query</label>
 				<div id="btx_social_feed_query">
-					<?
+					<?php
 						if ($service && $type) {
 							include EXTENSION_ROOT."ajax/query-element.php";
 						} else {
 					?>
 					<input type="text" disabled="disabled" value="Choose a Service and Type" />
-					<?
+					<?php
 						}
 					?>
 				</div>
 			</fieldset>
 			<fieldset id="btx_social_feed_categories">
 				<label>Categories</label>
-				<?
+				<?php
 					$field = $category_field;
 					include SERVER_ROOT."core/admin/form-field-types/draw/many-to-many.php";
 				?>
@@ -78,6 +78,6 @@
 		</footer>
 	</form>
 </div>
-<?
+<?php
 	}
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	BigTree::globalizePOSTVars();
 
 	if ($type == "Location") {
@@ -16,4 +16,3 @@
 	
 	$admin->growl("Social Feed","Created Query");
 	BigTree::redirect(MODULE_ROOT."view-queries/");
-?>

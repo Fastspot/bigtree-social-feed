@@ -342,7 +342,7 @@
 						$user_response = $facebook->callUncached($f["query"]."?fields=username,link");
 
 						// Get posts
-						$response = $facebook->callUncached($f["query"]."/posts?fields=id,message,type,picture,link,actions,created_time,updated_time&limit=".self::$SyncCount);
+						$response = $facebook->callUncached($user_response->id."/posts?fields=id,message,type,picture,link,actions,created_time,updated_time&limit=".self::$SyncCount);
 
 						// We're going to emulate the response from the more mature APIs
 						$data = new stdClass;
