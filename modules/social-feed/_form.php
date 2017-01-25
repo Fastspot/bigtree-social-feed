@@ -26,10 +26,16 @@
 <?php
 	} else {
 ?>
+<style type="text/css">
+	#btx_social_feed_query_clear { display: none; }
+	#btx_social_feed_query_clear.active { display: block; }
+</style>
+
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <div class="container" id="btx_social_feed_container">
-	<form method="post" action="<?=MODULE_ROOT.$action?>/">
+	<form method="post" action="<?=MODULE_ROOT.$action?>/" id="btx_social_feed_form">
 		<section>
+			<p class="error_message" style="display: none;">Please select a query result before submitting.</p>
 			<fieldset>
 				<label>Service</label>
 				<select name="service" id="btx_social_feed_service_select">

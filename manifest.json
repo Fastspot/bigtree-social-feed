@@ -1,8 +1,8 @@
 {
     "type": "extension",
     "id": "com.fastspot.social-feed",
-    "version": "1.2",
-    "revision": 4,
+    "version": "1.2.1",
+    "revision": 5,
     "compatibility": "4.2+",
     "title": "Social Feed",
     "description": "Implements a class and admin interface to pull information from various social networks into a single cached stream of data based on user preferences (i.e. location, hashtag, particular users, search query).",
@@ -44,7 +44,7 @@
                     {
                         "id": "35",
                         "module": "8",
-                        "name": "Stream",
+                        "name": "View Stream",
                         "route": "",
                         "in_nav": "on",
                         "form": null,
@@ -283,19 +283,19 @@
                         "table": "btx_social_feed_stream",
                         "fields": {
                             "date": {
-                                "width": "120",
+                                "width": "127",
                                 "title": "Date",
                                 "parser": "",
                                 "numeric": false
                             },
                             "service": {
-                                "width": "72",
+                                "width": "91",
                                 "title": "Service",
                                 "parser": "",
                                 "numeric": false
                             },
                             "data": {
-                                "width": "474",
+                                "width": "490",
                                 "title": "Excerpt",
                                 "parser": "$d = json_decode($value); if (isset($d->Caption)) { \t$value = $d->Caption; } elseif (isset($d->Title)) { \t$value = $d->Title; } elseif (isset($d->Content)) { \t$value = $d->Content; }  elseif ($d->Message) { $value = $d->Message; } elseif ($d->Link) { $value = $d->Link; }  $value = strip_tags(htmlspecialchars_decode($value,ENT_QUOTES));",
                                 "numeric": false
@@ -309,8 +309,7 @@
                         "actions": {
                             "0": "{\"name\":\"Preview\",\"class\":\"icon_preview\",\"route\":\"\",\"function\":\"BTXSocialFeed::previewLink\"}",
                             "approve": "on",
-                            "edit": "on",
-                            "ignore": "{\"name\":\"Ignore\",\"class\":\"icon_draft\",\"route\":\"ignore\",\"function\":\"\"}"
+                            "ignore": "{\"name\":\"Ignore\",\"class\":\"icon_archive\",\"route\":\"ignore\",\"function\":\"\"}"
                         },
                         "preview_url": "",
                         "related_form": null

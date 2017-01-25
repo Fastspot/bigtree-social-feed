@@ -6,6 +6,7 @@ var BTXSocialFeed = (function() {
 
 	var Map;
 	var MapMarker;
+	var QueryEntered = false;
 	var QueryFillers;
 	var QueryTimer;
 	var QueryURL;
@@ -30,6 +31,8 @@ var BTXSocialFeed = (function() {
 			$("#btx_social_feed_query_element").val("");
 			$("#btx_social_feed_query_results").hide();
 			$(".btx_social_feed_add_info").hide();
+			$("#btx_social_feed_query_clear").removeClass("active");
+			QueryEntered = false;
 
 		// Hook location searches
 		}).on("keyup","#btx_social_feed_location_query",function() {
@@ -66,10 +69,21 @@ var BTXSocialFeed = (function() {
 
 			// Hide the results dropdown
 			$("#btx_social_feed_query_results").hide();
+			$("#btx_social_feed_query_clear").addClass("active");
+			QueryEntered = true;
 
 		// Hook type change
 		}).on("change","#btx_social_feed_type_select", function() {
 			$("#btx_social_feed_query").load("admin_root/*/com.fastspot.social-feed/ajax/query-element/",{ service: $("#btx_social_feed_service_select").val(), type: $(this).val() }, BigTreeCustomControls);
+		});
+
+		$("#btx_social_feed_form").submit(function(ev) {
+			if (!QueryEntered) {
+				ev.stopPropagation();
+				ev.preventDefault();
+
+				$(this).find(".error_message").show();
+			}
 		});
 	});
 
@@ -112,8 +126,9 @@ var BTXSocialFeed = (function() {
 		});
 	}
 
-	function setupQuery(url,fillers) {
+	function setupQuery(url, fillers, query_entered) {
 		QueryURL = url;
+		QueryEntered = query_entered;
 		QueryFillers = fillers;
 	}
 
@@ -122,14 +137,12 @@ var BTXSocialFeed = (function() {
 		if (query && QueryURL) {
 			// Show progress spinner, hide the clear button
 			$("#btx_social_feed_query_spinner").show();
-			$("#btx_social_feed_query_clear").hide();
 
 			// Request info from the social API
 			$.ajax("admin_root/*/com.fastspot.social-feed/ajax/" + QueryURL + "/", { method: "POST", data: { query: query }, complete: function(r) {
 
 				// Hide the spinner, show clear button
 				$("#btx_social_feed_query_spinner").hide();
-				$("#btx_social_feed_query_clear").show();
 
 				if (r.responseText) {
 					$("#btx_social_feed_query_results").html(r.responseText).show();

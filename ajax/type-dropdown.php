@@ -1,4 +1,4 @@
-<?
+<?php
 	$service = isset($_POST["service"]) ? $_POST["service"] : $service;
 	if ($service == "Instagram") {
 		$types = array(
@@ -31,7 +31,7 @@
 ?>
 <select name="type" id="btx_social_feed_type_select">
 	<option></option>
-	<? foreach ($types as $t) { ?>
-	<option<? if ($t == $type) { ?> selected="selected"<? } ?>><?=$t?></option>
-	<? } ?>
+	<?php foreach ($types as $t) { ?>
+	<option<?php if ($t == $type) { ?> selected="selected"<?php } ?>><?=$t?></option>
+	<?php } ?>
 </select>
