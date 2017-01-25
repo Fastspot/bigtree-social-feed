@@ -2,7 +2,7 @@
     "type": "extension",
     "id": "com.fastspot.social-feed",
     "version": "1.2",
-    "revision": 3,
+    "revision": 4,
     "compatibility": "4.2+",
     "title": "Social Feed",
     "description": "Implements a class and admin interface to pull information from various social networks into a single cached stream of data based on user preferences (i.e. location, hashtag, particular users, search query).",
@@ -27,7 +27,7 @@
         "module_groups": [],
         "modules": [
             {
-                "id": "5",
+                "id": "8",
                 "group": null,
                 "name": "Social Feed",
                 "route": "com.fastspot.social-feed*social-feed",
@@ -42,34 +42,34 @@
                 "extension": "com.fastspot.social-feed",
                 "actions": [
                     {
-                        "id": "18",
-                        "module": "5",
-                        "name": "View Stream",
+                        "id": "35",
+                        "module": "8",
+                        "name": "Stream",
                         "route": "",
                         "in_nav": "on",
                         "form": null,
-                        "view": "8",
+                        "view": "14",
                         "report": null,
                         "class": "twitter",
                         "level": "0",
                         "position": "0"
                     },
                     {
-                        "id": "19",
-                        "module": "5",
-                        "name": "View Queries",
+                        "id": "36",
+                        "module": "8",
+                        "name": "Queries",
                         "route": "view-queries",
                         "in_nav": "on",
                         "form": null,
-                        "view": "7",
+                        "view": "13",
                         "report": null,
                         "class": "export",
                         "level": "0",
                         "position": "0"
                     },
                     {
-                        "id": "20",
-                        "module": "5",
+                        "id": "37",
+                        "module": "8",
                         "name": "Add Query",
                         "route": "add-query",
                         "in_nav": "on",
@@ -81,21 +81,21 @@
                         "position": "0"
                     },
                     {
-                        "id": "21",
-                        "module": "5",
+                        "id": "38",
+                        "module": "8",
                         "name": "View Categories",
                         "route": "view-categories",
                         "in_nav": "on",
                         "form": null,
-                        "view": "6",
+                        "view": "11",
                         "report": null,
                         "class": "category",
                         "level": "0",
                         "position": "0"
                     },
                     {
-                        "id": "22",
-                        "module": "5",
+                        "id": "39",
+                        "module": "8",
                         "name": "Edit Query",
                         "route": "edit-query",
                         "in_nav": "",
@@ -107,12 +107,12 @@
                         "position": "0"
                     },
                     {
-                        "id": "23",
-                        "module": "5",
+                        "id": "40",
+                        "module": "8",
                         "name": "Add Category",
                         "route": "add-category",
                         "in_nav": "on",
-                        "form": "5",
+                        "form": "8",
                         "view": null,
                         "report": null,
                         "class": "add",
@@ -120,12 +120,12 @@
                         "position": "0"
                     },
                     {
-                        "id": "24",
-                        "module": "5",
+                        "id": "41",
+                        "module": "8",
                         "name": "Edit Category",
                         "route": "edit-category",
                         "in_nav": "",
-                        "form": "5",
+                        "form": "8",
                         "view": null,
                         "report": null,
                         "class": "edit",
@@ -133,8 +133,8 @@
                         "position": "0"
                     },
                     {
-                        "id": "25",
-                        "module": "5",
+                        "id": "42",
+                        "module": "8",
                         "name": "Settings",
                         "route": "settings",
                         "in_nav": "on",
@@ -146,8 +146,8 @@
                         "position": "0"
                     },
                     {
-                        "id": "26",
-                        "module": "5",
+                        "id": "43",
+                        "module": "8",
                         "name": "Sync",
                         "route": "sync",
                         "in_nav": "on",
@@ -157,12 +157,25 @@
                         "class": "gear",
                         "level": "0",
                         "position": "0"
+                    },
+                    {
+                        "id": "44",
+                        "module": "8",
+                        "name": "Ignored",
+                        "route": "ignored",
+                        "in_nav": "on",
+                        "form": null,
+                        "view": "12",
+                        "report": null,
+                        "class": "delete",
+                        "level": "0",
+                        "position": "0"
                     }
                 ],
                 "views": [
                     {
-                        "id": "6",
-                        "module": "5",
+                        "id": "11",
+                        "module": "8",
                         "title": "Categories",
                         "description": "",
                         "type": "searchable",
@@ -188,8 +201,47 @@
                         "related_form": null
                     },
                     {
-                        "id": "7",
-                        "module": "5",
+                        "id": "12",
+                        "module": "8",
+                        "title": "Ignored",
+                        "description": "",
+                        "type": "searchable",
+                        "table": "btx_social_feed_stream",
+                        "fields": {
+                            "date": {
+                                "width": "151",
+                                "title": "Date",
+                                "parser": "",
+                                "numeric": false
+                            },
+                            "service": {
+                                "width": "105",
+                                "title": "Service",
+                                "parser": "",
+                                "numeric": false
+                            },
+                            "data": {
+                                "width": "491",
+                                "title": "Excerpt",
+                                "parser": "$d = json_decode($value); if (isset($d->Caption)) { \t$value = $d->Caption; } elseif (isset($d->Title)) { \t$value = $d->Title; } elseif (isset($d->Content)) { \t$value = $d->Content; }  elseif ($d->Message) { $value = $d->Message; } elseif ($d->Link) { $value = $d->Link; }  $value = strip_tags(htmlspecialchars_decode($value,ENT_QUOTES));",
+                                "numeric": false
+                            }
+                        },
+                        "options": {
+                            "filter": "BTXSocialFeed::filterIgnored",
+                            "sort": "`date` DESC",
+                            "per_page": "15"
+                        },
+                        "actions": {
+                            "unignore": "{\"name\":\"Unignore\",\"class\":\"icon_restore\",\"route\":\"unignore\",\"function\":\"\"}",
+                            "delete": "on"
+                        },
+                        "preview_url": "",
+                        "related_form": null
+                    },
+                    {
+                        "id": "13",
+                        "module": "8",
                         "title": "Queries",
                         "description": "",
                         "type": "searchable",
@@ -210,7 +262,7 @@
                             "query": {
                                 "width": "465",
                                 "title": "Query",
-                                "parser": "if ($item[\"type\"] == \"Location\") { $v = json_decode($value,true); $value = $v[\"latitude\"].\", \".$v[\"longitude\"]; } elseif ($item[\"type\"] == \"Person\") { $v = json_decode($item[\"cached_info\"],true); $value = $v[\"name\"]; }",
+                                "parser": "if ($item[\"type\"] == \"Location\") { $v = json_decode($value,true); $value = $v[\"latitude\"].\", \".$v[\"longitude\"]; } elseif ($item[\"type\"] == \"Person\" || $item[\"type\"] == \"Page\") { $v = json_decode($item[\"cached_info\"],true); $value = $v[\"name\"]; }",
                                 "numeric": false
                             }
                         },
@@ -223,8 +275,8 @@
                         "related_form": null
                     },
                     {
-                        "id": "8",
-                        "module": "5",
+                        "id": "14",
+                        "module": "8",
                         "title": "Stream",
                         "description": "",
                         "type": "searchable",
@@ -245,20 +297,20 @@
                             "data": {
                                 "width": "474",
                                 "title": "Excerpt",
-                                "parser": "$d = json_decode($value); if (isset($d->Caption)) { \t$value = $d->Caption; } elseif (isset($d->Title)) { \t$value = $d->Title; } elseif (isset($d->Content)) { \t$value = $d->Content; } elseif ($d->Message) { $value = $d->Message; } $value = strip_tags(htmlspecialchars_decode($value,ENT_QUOTES));",
+                                "parser": "$d = json_decode($value); if (isset($d->Caption)) { \t$value = $d->Caption; } elseif (isset($d->Title)) { \t$value = $d->Title; } elseif (isset($d->Content)) { \t$value = $d->Content; }  elseif ($d->Message) { $value = $d->Message; } elseif ($d->Link) { $value = $d->Link; }  $value = strip_tags(htmlspecialchars_decode($value,ENT_QUOTES));",
                                 "numeric": false
                             }
                         },
                         "options": {
+                            "filter": "BTXSocialFeed::filterActive",
                             "sort": "`date` DESC",
-                            "per_page": "15",
-                            "filter": ""
+                            "per_page": "15"
                         },
                         "actions": {
                             "0": "{\"name\":\"Preview\",\"class\":\"icon_preview\",\"route\":\"\",\"function\":\"BTXSocialFeed::previewLink\"}",
                             "approve": "on",
                             "edit": "on",
-                            "delete": "on"
+                            "ignore": "{\"name\":\"Ignore\",\"class\":\"icon_draft\",\"route\":\"ignore\",\"function\":\"\"}"
                         },
                         "preview_url": "",
                         "related_form": null
@@ -266,8 +318,8 @@
                 ],
                 "forms": [
                     {
-                        "id": "5",
-                        "module": "5",
+                        "id": "8",
+                        "module": "8",
                         "title": "Category",
                         "table": "btx_social_feed_categories",
                         "fields": [
@@ -282,7 +334,7 @@
                             }
                         ],
                         "default_position": "",
-                        "return_view": "6",
+                        "return_view": "11",
                         "return_url": "",
                         "tagging": "",
                         "hooks": {
@@ -294,15 +346,15 @@
                 ],
                 "embed_forms": [
                     {
-                        "id": "1",
-                        "module": "5",
+                        "id": "2",
+                        "module": "8",
                         "title": "Example",
                         "table": "",
                         "fields": [],
                         "default_position": "",
                         "default_pending": "",
                         "css": "",
-                        "hash": "5720da88ee939",
+                        "hash": "58890ae6af33f",
                         "redirect_url": "",
                         "thank_you_message": "",
                         "hooks": "null"
@@ -320,7 +372,7 @@
             "btx_social_feed_categories": "CREATE TABLE `btx_social_feed_categories` (   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,   `name` varchar(255) NOT NULL DEFAULT '',   PRIMARY KEY (`id`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
             "btx_social_feed_queries": "CREATE TABLE `btx_social_feed_queries` (   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,   `service` varchar(255) NOT NULL,   `type` varchar(255) NOT NULL DEFAULT '',   `query` varchar(255) NOT NULL DEFAULT '',   `cached_info` text NOT NULL,   PRIMARY KEY (`id`),   KEY `service` (`service`),   KEY `type` (`type`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
             "btx_social_feed_query_categories": "CREATE TABLE `btx_social_feed_query_categories` (   `query` int(11) unsigned NOT NULL,   `category` int(11) unsigned NOT NULL,   KEY `query` (`query`),   KEY `category` (`category`),    FOREIGN KEY (`query`) REFERENCES `btx_social_feed_queries` (`id`) ON DELETE CASCADE,    FOREIGN KEY (`category`) REFERENCES `btx_social_feed_categories` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
-            "btx_social_feed_stream": "CREATE TABLE `btx_social_feed_stream` (   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,   `date` datetime NOT NULL,   `service` varchar(255) NOT NULL DEFAULT '',   `service_id` varchar(255) NOT NULL,   `data` text NOT NULL,   `approved` char(2) NOT NULL DEFAULT '',   PRIMARY KEY (`id`),   KEY `service` (`service`),   KEY `service_id` (`service_id`),   KEY `date` (`date`),   KEY `approved` (`approved`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
+            "btx_social_feed_stream": "CREATE TABLE `btx_social_feed_stream` (   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,   `date` datetime NOT NULL,   `service` varchar(255) NOT NULL DEFAULT '',   `service_id` varchar(255) NOT NULL,   `data` text NOT NULL,   `approved` char(2) NOT NULL DEFAULT '',   `ignored` char(2) NOT NULL DEFAULT '',   PRIMARY KEY (`id`),   KEY `service` (`service`),   KEY `service_id` (`service_id`),   KEY `date` (`date`),   KEY `approved` (`approved`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
             "btx_social_feed_stream_categories": "CREATE TABLE `btx_social_feed_stream_categories` (   `item` int(11) unsigned NOT NULL,   `category` int(11) unsigned NOT NULL,   KEY `item` (`item`),   KEY `category` (`category`),    FOREIGN KEY (`item`) REFERENCES `btx_social_feed_stream` (`id`) ON DELETE CASCADE,    FOREIGN KEY (`category`) REFERENCES `btx_social_feed_categories` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
             "btx_social_feed_stream_queries": "CREATE TABLE `btx_social_feed_stream_queries` (   `item` int(11) unsigned NOT NULL,   `query` int(11) unsigned NOT NULL,   KEY `item` (`item`),   KEY `query` (`query`),    FOREIGN KEY (`item`) REFERENCES `btx_social_feed_stream` (`id`) ON DELETE CASCADE,    FOREIGN KEY (`query`) REFERENCES `btx_social_feed_queries` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
         }
@@ -339,6 +391,9 @@
             "CREATE TABLE `btx_social_feed_stream` (   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,   `date` datetime NOT NULL,   `service` varchar(255) NOT NULL DEFAULT '',   `service_id` varchar(255) NOT NULL,   `data` text NOT NULL,   `approved` char(2) NOT NULL DEFAULT '',   PRIMARY KEY (`id`),   KEY `service` (`service`),   KEY `service_id` (`service_id`),   KEY `date` (`date`),   KEY `approved` (`approved`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
             "CREATE TABLE `btx_social_feed_stream_categories` (   `item` int(11) unsigned NOT NULL,   `category` int(11) unsigned NOT NULL,   KEY `item` (`item`),   KEY `category` (`category`),    FOREIGN KEY (`item`) REFERENCES `btx_social_feed_stream` (`id`) ON DELETE CASCADE,    FOREIGN KEY (`category`) REFERENCES `btx_social_feed_categories` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=utf8",
             "CREATE TABLE `btx_social_feed_stream_queries` (   `item` int(11) unsigned NOT NULL,   `query` int(11) unsigned NOT NULL,   KEY `item` (`item`),   KEY `query` (`query`),    FOREIGN KEY (`item`) REFERENCES `btx_social_feed_stream` (`id`) ON DELETE CASCADE,    FOREIGN KEY (`query`) REFERENCES `btx_social_feed_queries` (`id`) ON DELETE CASCADE ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+        ],
+        "2": [
+            "ALTER TABLE `btx_social_feed_stream` ADD COLUMN `ignored` char(2) NOT NULL DEFAULT '' AFTER `approved`"
         ]
     }
 }
