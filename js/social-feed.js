@@ -134,6 +134,7 @@ var BTXSocialFeed = (function() {
 
 	function socialLookup() {
 		var query = $("#btx_social_feed_query_element").val();
+		
 		if (query && QueryURL) {
 			// Show progress spinner, hide the clear button
 			$("#btx_social_feed_query_spinner").show();
@@ -153,6 +154,10 @@ var BTXSocialFeed = (function() {
 			}});
 		} else {
 			$("#btx_social_feed_query_results").hide();
+
+			if (query) {
+				QueryEntered = true;
+			}
 		}
 	}
 
