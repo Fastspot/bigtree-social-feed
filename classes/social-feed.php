@@ -65,10 +65,24 @@
 		static function getCategories() {
 			$items = array();
 			$q = sqlquery("SELECT * FROM btx_social_feed_categories");
+			
 			while ($f = sqlfetch($q)) {
 				$items[] = $f;
 			}
+
 			return $items;
+		}
+
+		/*
+			Function: getCategoryByRoute
+				Returns a category for the provided route.
+
+			Returns:
+				A category or false if no match exists.
+		*/
+
+		static function getCategoryByRoute($route) {
+			return sqlfetch(sqlquery("SELECT * FROM btx_social_feed_categories WHERE route = '".sqlescape($route)."'"));
 		}
 
 		/*
@@ -84,10 +98,59 @@
 				An array of social objects
 		*/
 
-		function getPage($page = 1, $count = 10, $include_unapproved = false) {
+		static function getPage($page = 1, $count = 10, $include_unapproved = false) {
 			$page = $page ? ($page - 1) : 0;
 
 			return static::getRecent(($count * $page).", $count", $include_unapproved);
+		}
+
+		/*
+			Function: getPageFromService
+				Returns a page of recent items from the stream from a given service.
+
+			Parameters:
+				service - Service to return (Flickr, Google+, Instagram, Twitter, YouTube)
+				page - The page number to include (starts at 1)
+				count - The number to return per page (defaults to 10)
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects
+		*/
+
+		static function getPageFromService($service, $page = 1, $count = 10, $include_unapproved = false) {
+			$page = $page ? ($page - 1) : 0;
+
+			return static::getRecentFromService(($count * $page).", $count", $service, $include_unapproved);
+		}
+
+		/*
+			Function: getPageFromServiceInCategory
+				Returns a page of recent items from the stream from a given service and category.
+
+			Parameters:
+				service - Service to return (Flickr, Google+, Instagram, Twitter, YouTube)
+				category - A category ID
+				page - The page number to include (starts at 1)
+				count - The number to return per page (defaults to 10)
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects
+		*/
+
+		static function getPageFromServiceInCategory($service, $category, $page = 1, $count = 10, $include_unapproved = false) {
+			$page = $page ? ($page - 1) : 0;
+			$service = sqlescape($service);
+			$category = sqlescape($category);
+
+			return self::_get("SELECT s.* FROM btx_social_feed_stream AS `s` 
+								 JOIN btx_social_feed_stream_categories AS `c` 
+								 ON s.id = c.item 
+							   WHERE s.service = '$service'
+							     AND c.category = '$category'".
+							   	 (!$include_unapproved ? " AND s.approved = 'on'" : "")." 
+							   ORDER BY s.date DESC LIMIT $count");
 		}
 		
 		/*
@@ -102,9 +165,53 @@
 				An array of social objects
 		*/
 
-		function getPageCount($count = 10, $include_unapproved = false) {
+		static function getPageCount($count = 10, $include_unapproved = false) {
 			$f = sqlfetch(sqlquery("SELECT COUNT(*) AS `count` FROM btx_social_feed_stream ".(!$include_unapproved ? "WHERE approved = 'on'" : "")));
 			$pages = ceil($f["count"] / $count);
+			
+			return $pages ? $pages : 1;
+		}
+
+		/*
+			Function: getPageCountFromService
+				Returns the number of pages in the stream from a given service.
+
+			Parameters:
+				service - Service to return (Flickr, Google+, Instagram, Twitter, YouTube)
+				count - The number to return per page (defaults to 10)
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects
+		*/
+
+		static function getPageCountFromService($service, $count = 10, $include_unapproved = false) {
+			$f = sqlfetch(sqlquery("SELECT COUNT(*) AS `count` FROM btx_social_feed_stream WHERE service = '".sqlescape($service)."'".(!$include_unapproved ? " AND approved = 'on'" : "")));
+			$pages = ceil($f["count"] / $count);
+			
+			return $pages ? $pages : 1;
+		}
+
+		/*
+			Function: getPageCountFromServiceInCategory
+				Returns the number of pages in the stream from a given service and category.
+
+			Parameters:
+				service - Service to return (Flickr, Google+, Instagram, Twitter, YouTube)
+				category - A category ID
+				count - The number to return per page (defaults to 10)
+				include_unapproved - Whether to include unapproved items (defaults to false)
+
+			Returns:
+				An array of social objects
+		*/
+
+		static function getPageCountFromServiceInCategory($service, $category, $count = 10, $include_unapproved = false) {
+			$results = sqlrows(sqlquery("SELECT DISTINCT(item) FROM btx_social_feed_stream_categories JOIN btx_social_feed_stream
+										 ON btx_social_feed_stream_categories.item = btx_social_feed_stream.id
+										 WHERE service = '".sqlescape($service)."'
+										   AND category = '".sqlescape($category)."'"));
+			$pages = ceil($results / $count);
 			
 			return $pages ? $pages : 1;
 		}
@@ -114,7 +221,7 @@
 				Returns the number of pages of items in a given category in the stream.
 
 			Parameters:
-				category - The category to require
+				category - A category ID
 				count - The number to return per page (defaults to 10)
 				include_unapproved - Whether to include unapproved items (defaults to false)
 
@@ -122,7 +229,7 @@
 				An array of social objects
 		*/
 
-		function getPageCountInCategory($category, $count, $include_unapproved = false) {
+		static function getPageCountInCategory($category, $count, $include_unapproved = false) {
 			$results = sqlrows(sqlquery("SELECT DISTINCT(item) FROM btx_social_feed_stream_categories WHERE category = '".sqlescape($category)."'"));
 			$pages = ceil($results / $count);
 			
@@ -268,15 +375,19 @@
 				// Twitter
 				if ($f["service"] == "Twitter") {
 					$twitter = isset($twitter) ? $twitter : new BigTreeTwitterAPI;
-					$params = array();
+					$params = array("tweet_mode" => "extended");
+
 					if (self::$IgnoreRetweets) {
 						$params["include_rts"] = false;
 					}
+
 					if (self::$IgnoreReplies) {
 						$params["exclude_replies"] = true;
 					}
+
 					if ($f["type"] == "Person") {
 						self::syncData($f,"Twitter",$twitter->getUserTimeline($f["query"],self::$SyncCount,$params));
+						print_r($twitter);
 					} elseif ($f["type"] == "Hashtag") {
 						self::syncData($f,"Twitter",$twitter->searchTweets("#".ltrim(trim($f["query"]),"#"),self::$SyncCount,"recent",false,false,false,$params));
 					} elseif ($f["type"] == "Search") {
@@ -367,8 +478,10 @@
 			}
 
 			// Get view information for manually caching the records
-			$view = BigTreeAutoModule::getViewForTable("btx_social_feed_stream");
+			$view = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = 'btx_social_feed_stream' AND `title` != 'Ignored'"));
+			$view["fields"] = json_decode($view["fields"], true);
 			$parsers = array();
+
 			foreach ($view["fields"] as $key => $field) {
 				if ($field["parser"]) {
 					$parsers[$key] = $field["parser"];
