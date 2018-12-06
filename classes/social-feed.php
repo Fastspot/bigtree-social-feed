@@ -387,7 +387,6 @@
 
 					if ($f["type"] == "Person") {
 						self::syncData($f,"Twitter",$twitter->getUserTimeline($f["query"],self::$SyncCount,$params));
-						print_r($twitter);
 					} elseif ($f["type"] == "Hashtag") {
 						self::syncData($f,"Twitter",$twitter->searchTweets("#".ltrim(trim($f["query"]),"#"),self::$SyncCount,"recent",false,false,false,$params));
 					} elseif ($f["type"] == "Search") {
@@ -511,8 +510,10 @@
 					$id = sqlescape($r->ID);
 					// Check for existing
 					$existing = sqlfetch(sqlquery("SELECT id FROM btx_social_feed_stream WHERE service = '$service' AND service_id = '$id'"));
+					
 					if (!$existing) {
 						$data = sqlescape(json_encode($r));
+					
 						if ($r->Timestamp) {
 							$date = sqlescape($r->Timestamp);
 						} elseif ($r->CreatedAt) {
@@ -522,9 +523,12 @@
 						} else {
 							$date = date("Y-m-d H:i:s");
 						}
+					
 						sqlquery("INSERT INTO btx_social_feed_stream (`date`,`service`,`service_id`,`data`,`approved`) VALUES ('$date','$service','$id','$data','".self::$DefaultApprovedState."')");
 						$existing["id"] = sqlid();
 						self::$ItemsToCache[] = array("id" => sqlid(),"date" => $date,"service" => $service,"service_id" => $id,"data" => json_encode($r),"approved" => self::$DefaultApprovedState);
+					} else {
+						sqlquery("UPDATE btx_social_feed_stream SET data = '".sqlescape(json_encode($r))."' WHERE id = '".$existing["id"]."'");
 					}
 
 					// Tag to categories
