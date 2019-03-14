@@ -477,18 +477,35 @@
 			}
 
 			// Get view information for manually caching the records
-			$view = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = 'btx_social_feed_stream' AND `title` != 'Ignored'"));
-			$view["fields"] = json_decode($view["fields"], true);
-			$parsers = array();
+			if (BIGTREE_REVISION > 400) {
+				$modules = BigTreeJSONDB::getAll("modules");
 
-			foreach ($view["fields"] as $key => $field) {
-				if ($field["parser"]) {
-					$parsers[$key] = $field["parser"];
+				foreach ($modules as $module) {
+					if (is_array($module["views"])) {
+						foreach ($module["views"] as $view) {
+							if ($view["table"] == "btx_social_feed_stream" && $view["title"] != "Ignored") {
+								break 2;
+							}
+						}
+					}
 				}
+			} else {
+				$view = sqlfetch(sqlquery("SELECT * FROM bigtree_module_views WHERE `table` = 'btx_social_feed_stream' AND `title` != 'Ignored'"));
+				$view["fields"] = json_decode($view["fields"], true);
 			}
 
-			foreach (self::$ItemsToCache as $i) {
-				BigTreeAutoModule::cacheRecord($i,$view,$parsers,array(),$i);
+			if ($view && $view["table"] == "btx_social_feed_stream") {
+				$parsers = array();
+	
+				foreach ($view["fields"] as $key => $field) {
+					if ($field["parser"]) {
+						$parsers[$key] = $field["parser"];
+					}
+				}
+	
+				foreach (self::$ItemsToCache as $i) {
+					BigTreeAutoModule::cacheRecord($i,$view,$parsers,array(),$i);
+				}
 			}
 		}
 
