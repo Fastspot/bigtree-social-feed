@@ -75,7 +75,12 @@
 				<label>Categories</label>
 				<?php
 					$field = $category_field;
-					include SERVER_ROOT."core/admin/form-field-types/draw/many-to-many.php";
+
+					if (BIGTREE_REVISION < 300) {
+						include SERVER_ROOT."core/admin/form-field-types/draw/many-to-many.php";
+					} else {
+						include SERVER_ROOT."core/admin/field-types/many-to-many/draw.php";
+					}
 				?>
 			</fieldset>
 		</section>

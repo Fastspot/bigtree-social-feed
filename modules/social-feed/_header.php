@@ -20,9 +20,13 @@
 			"mtm-sort" => "name"
 		)
 	);
+
 	$category_parser = array(array(
 		"table" => $category_field["options"]["mtm-connecting-table"],
 		"my-id" => $category_field["options"]["mtm-my-id"],
 		"other-id" => $category_field["options"]["mtm-other-id"],
 		"data" => $_POST["categories"]
 	));
+
+	$category_field["settings"] = $category_field["options"];
+	
